@@ -1,0 +1,45 @@
+{
+  "name": "vue-hotkey",
+  "version": "0.0.1",
+  "repository": "https://github.com/Simolation/vue-hotkey.git",
+  "author": "Simon Osterlehner <simon@osterlehner.de>",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue-hotkey.umd.js",
+  "module": "./dist/vue-hotkey.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-hotkey.es.js",
+      "require": "./dist/vue-hotkey.umd.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "yarn vite",
+    "build": "yarn vite build && yarn vue-tsc --emitDeclarationOnly",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue-demi": "^0.12.1"
+  },
+  "peerDependencies": {
+    "@vue/composition-api": "^1.0.0-rc.1",
+    "vue": "^2.0.0 || >=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.18",
+    "@vitejs/plugin-vue": "^2.2.0",
+    "typescript": "^4.5.4",
+    "vite": "^2.8.0",
+    "vue": "^3.0.0",
+    "vue-tsc": "^0.29.8"
+  }
+}
