@@ -10,3 +10,4 @@ function install(Vue: App) {
 }
 
 export default { install };
+export { HotKey };
