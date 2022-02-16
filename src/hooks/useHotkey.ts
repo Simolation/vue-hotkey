@@ -9,7 +9,10 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotKeyMap = new Map();
 
-export const useHotkey = (hotKey: IHotKey) => {
+export const useHotkey = (
+  hotKey: IHotKey,
+  exludedElements: string[] = ["input", "textarea"]
+) => {
   const hotKeyString = buildHotKeyIndexFromString(hotKey.keys);
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
@@ -36,7 +39,7 @@ export const useHotkey = (hotKey: IHotKey) => {
   };
 
   onMounted(() => {
-    registeredHotKeys.set(hotKeyString, hotKey);
+    registeredHotKeys.set(hotKeyString, { hotKey, exludedElements });
   });
 
   onUnmounted(destroy);
@@ -61,18 +64,20 @@ const dispatchHotKey = (key: string[]) => {
  * @param event The keydown event
  */
 const keydown = (event: KeyboardEvent) => {
-  // Skip if the current element is not available
-  if (!isElementAvailable()) return;
-
   const pressedKeys = buildHotKeyIndexFromEvent(event) as string;
 
-  const hotKey = registeredHotKeys.get(pressedKeys);
+  const hotKeyEntry = registeredHotKeys.get(pressedKeys);
 
   // Skip if the pressed keys are not registered as a hotkey
-  if (!hotKey) return;
+  if (!hotKeyEntry) return;
+
+  const hotKey = hotKeyEntry.hotKey;
 
   // Skip if the hotkey is disabled
   if (!hotKey.enabled!.value) return;
+
+  // Skip if the current element is not available
+  if (!isElementAvailable(hotKeyEntry.exludedElements)) return;
 
   // Stop propagation to prevent the default action
   if (!hotKey.propagate?.value) {

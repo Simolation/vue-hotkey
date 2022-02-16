@@ -7,4 +7,9 @@ export interface IHotKey {
   enabled?: Ref<boolean>;
 }
 
-export type IHotKeyMap = Map<string, IHotKey>;
+interface IHotKeyMapEntry {
+  hotKey: IHotKey;
+  exludedElements?: string[];
+}
+
+export type IHotKeyMap = Map<string, IHotKeyMapEntry>;

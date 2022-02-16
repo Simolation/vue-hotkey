@@ -33,6 +33,16 @@ export default defineComponent({
       type: Boolean as PropType<boolean>,
       default: true,
     },
+    /**
+     * Exclude specific HTML elements from the hotkey.
+     * ```vue
+     * :exclude-elements="['input', 'textarea']"
+     * ```
+     */
+    excludedElements: {
+      type: Array as PropType<string[] | undefined>,
+      default: undefined,
+    },
   },
   emits: ["hotkey"],
   setup(props, { emit, slots }) {
@@ -43,14 +53,17 @@ export default defineComponent({
         : props.keys;
 
     // Enable hotkey
-    useHotkey({
-      keys: keyValue,
-      handler: (keys: string[]) => {
-        emit("hotkey", keys);
+    useHotkey(
+      {
+        keys: keyValue,
+        handler: (keys: string[]) => {
+          emit("hotkey", keys);
+        },
+        propagate: computed(() => props.propagate),
+        enabled: computed(() => props.enabled),
       },
-      propagate: computed(() => props.propagate),
-      enabled: computed(() => props.enabled),
-    });
+      props.excludedElements
+    );
 
     // Render slots
     return () => {
