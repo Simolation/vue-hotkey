@@ -1,5 +1,5 @@
 {
-  "name": "vue-hotkey",
+  "name": "@simolation/vue-hotkey",
   "version": "0.0.1",
   "repository": "https://github.com/Simolation/vue-hotkey.git",
   "author": "Simon Osterlehner <simon@osterlehner.de>",
@@ -17,10 +17,14 @@
     }
   },
   "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "yarn vite",
     "build": "yarn vite build && yarn vue-tsc --emitDeclarationOnly",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "publish": "npm publish --access=public"
   },
   "dependencies": {
     "vue-demi": "^0.12.1"
