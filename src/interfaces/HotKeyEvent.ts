@@ -1,7 +1,7 @@
 /**
  * HotKey Event
  */
-export class HotKeyEvent extends Event {
+export class HotkeyEvent extends Event {
   public srcKey?: string[];
 
   constructor(srcKey?: string[]) {

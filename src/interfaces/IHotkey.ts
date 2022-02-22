@@ -1,15 +1,15 @@
 import { Ref } from "vue-demi";
 
-export interface IHotKey {
+export interface IHotkey {
   keys: string[];
   handler: (keys: string[]) => void;
   propagate?: Ref<boolean>;
   enabled?: Ref<boolean>;
 }
 
-interface IHotKeyMapEntry {
-  hotKey: IHotKey;
+interface IHotkeyMapEntry {
+  hotKey: IHotkey;
   exludedElements?: string[];
 }
 
-export type IHotKeyMap = Map<string, IHotKeyMapEntry>;
+export type IHotkeyMap = Map<string, IHotkeyMapEntry>;

@@ -1,13 +1,15 @@
 // export { IHotKey } from "./interfaces/IHotkey";
-export { HotKeyEvent } from "./interfaces/HotKeyEvent";
-export { useHotkey } from "./hooks/useHotKey";
+export { HotkeyEvent as HotKeyEvent } from "./interfaces/HotkeyEvent";
+export { useHotkey } from "./hooks/useHotkey";
 
-import { App } from "vue-demi";
-import HotKey from "./components/HotKey.vue";
+import { App, install as vueDemiInstall } from "vue-demi";
+vueDemiInstall();
+
+import Hotkey from "./components/Hotkey.vue";
 
 function install(Vue: App) {
-  Vue.component(HotKey.name, HotKey);
+  Vue.component(Hotkey.name, Hotkey);
 }
 
 export default { install };
-export { HotKey };
+export { Hotkey };

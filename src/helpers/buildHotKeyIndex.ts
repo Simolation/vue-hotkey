@@ -12,7 +12,7 @@
  * @source https://github.com/iFgR/vue-shortkey/blob/55d802ea305cadcc2ea970b55a3b8b86c7b44c05/src/index.js#L81
  */
 
-export const buildHotKeyIndexFromEvent = (
+export const buildHotkeyIndexFromEvent = (
   eKey: KeyboardEvent,
   asArray: boolean = false
 ): string | string[] => {
@@ -57,13 +57,13 @@ export const buildHotKeyIndexFromEvent = (
   return keys.join("+");
 };
 
-export const buildHotKeyIndexFromString = (pKey: string[]) => {
+export const buildHotkeyIndexFromString = (pKey: string[]) => {
   const keys: any = {};
   keys.shiftKey = pKey.includes("shift");
   keys.ctrlKey = pKey.includes("ctrl");
   keys.metaKey = pKey.includes("meta");
   keys.altKey = pKey.includes("alt");
-  let indexedKeys: string[] = buildHotKeyIndexFromEvent(keys, true) as string[];
+  let indexedKeys: string[] = buildHotkeyIndexFromEvent(keys, true) as string[];
   const vKey = pKey.filter(
     (item) => !["shift", "ctrl", "meta", "alt"].includes(item)
   );

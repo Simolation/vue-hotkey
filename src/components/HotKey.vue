@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue-demi";
-import { useHotkey } from "../hooks/useHotKey";
+import { defineComponent, PropType, ref, computed } from "vue-demi";
+import { useHotkey } from "../hooks/useHotkey";
 
 export default defineComponent({
-  name: "HotKey",
+  name: "Hotkey",
   props: {
     /**
      * The hotkey keys.
@@ -52,11 +52,19 @@ export default defineComponent({
         ? (JSON.parse(props.keys.replace(/\'/gi, '"')) as string[])
         : props.keys;
 
+    const clickRef = ref<HTMLElement | null>(null);
+    const focusRef = ref<HTMLElement | null>(null);
+
     // Enable hotkey
     useHotkey(
       {
         keys: keyValue,
         handler: (keys: string[]) => {
+          // When the element refs are not null, click/focus the element
+          clickRef.value?.click();
+          focusRef.value?.focus();
+
+          // Emit the hotkey action
           emit("hotkey", keys);
         },
         propagate: computed(() => props.propagate),
@@ -65,9 +73,12 @@ export default defineComponent({
       props.excludedElements
     );
 
-    // Render slots
+    // Render slot
     return () => {
-      return slots.default?.();
+      return slots.default?.({
+        clickRef,
+        focusRef,
+      });
     };
   },
 });

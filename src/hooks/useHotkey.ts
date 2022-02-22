@@ -1,19 +1,19 @@
 import { onMounted, onUnmounted, ref } from "vue-demi";
-import { IHotKey, IHotKeyMap } from "../interfaces/IHotkey";
-import { HotKeyEvent } from "../interfaces/HotKeyEvent";
+import { IHotkey, IHotkeyMap } from "../interfaces/IHotkey";
+import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
-  buildHotKeyIndexFromString,
-  buildHotKeyIndexFromEvent,
+  buildHotkeyIndexFromString,
+  buildHotkeyIndexFromEvent,
 } from "../helpers/buildHotKeyIndex";
 import { isElementAvailable } from "../helpers/isElementAvailable";
 
-const registeredHotKeys: IHotKeyMap = new Map();
+const registeredHotKeys: IHotkeyMap = new Map();
 
 export const useHotkey = (
-  hotKey: IHotKey,
+  hotKey: IHotkey,
   exludedElements: string[] = ["input", "textarea"]
 ) => {
-  const hotKeyString = buildHotKeyIndexFromString(hotKey.keys);
+  const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
 
@@ -53,7 +53,7 @@ export const useHotkey = (
  */
 const dispatchHotKey = (key: string[]) => {
   // Create a new hotkey event
-  const event = new HotKeyEvent(key);
+  const event = new HotkeyEvent(key);
 
   // Dispatch the event
   document.dispatchEvent(event);
@@ -64,7 +64,7 @@ const dispatchHotKey = (key: string[]) => {
  * @param event The keydown event
  */
 const keydown = (event: KeyboardEvent) => {
-  const pressedKeys = buildHotKeyIndexFromEvent(event) as string;
+  const pressedKeys = buildHotkeyIndexFromEvent(event) as string;
 
   const hotKeyEntry = registeredHotKeys.get(pressedKeys);
 
