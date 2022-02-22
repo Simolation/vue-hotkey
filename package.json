@@ -24,7 +24,7 @@
     "dev": "yarn vite",
     "build": "yarn vite build && yarn vue-tsc --emitDeclarationOnly",
     "preview": "vite preview",
-    "publish": "npm publish --access=public"
+    "do:publish": "npm publish --access=public"
   },
   "dependencies": {
     "vue-demi": "^0.12.1"
