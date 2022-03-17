@@ -12,4 +12,4 @@ interface IHotkeyMapEntry {
   exludedElements?: string[];
 }
 
-export type IHotkeyMap = Map<string, IHotkeyMapEntry>;
+export type IHotkeyMap = Map<string, IHotkeyMapEntry[]>;

@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref } from "vue-demi";
+import { inject, onMounted, onUnmounted, provide, ref } from "vue-demi";
 import { IHotkey, IHotkeyMap } from "../interfaces/IHotkey";
 import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
@@ -9,11 +9,14 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotkeyMap = new Map();
 
+const InjectSymbol = Symbol("hotkey");
+
 export const useHotkey = (
   hotKey: IHotkey,
   exludedElements: string[] = ["input", "textarea"]
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
+  const hotKeyEntry = { hotKey, exludedElements };
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
 
@@ -35,16 +38,51 @@ export const useHotkey = (
    * Destroy the hotkey
    */
   const destroy = () => {
-    registeredHotKeys.delete(hotKeyString);
+    const foundHotKeyEntries = registeredHotKeys.get(hotKeyString);
+    if (!foundHotKeyEntries) return;
+
+    // Remove the current hotkey from the list
+    const updatedHotKeyEntries = foundHotKeyEntries.filter(
+      (entry) => entry !== hotKeyEntry
+    );
+
+    // Update the hotkey list
+    if (updatedHotKeyEntries.length === 0) {
+      registeredHotKeys.delete(hotKeyString);
+    } else {
+      registeredHotKeys.set(hotKeyString, updatedHotKeyEntries);
+    }
   };
 
   onMounted(() => {
-    registeredHotKeys.set(hotKeyString, { hotKey, exludedElements });
+    // Get the already existing hot key entries
+    const foundHotKeyEntries = registeredHotKeys.get(hotKeyString);
+
+    // Append to the existing hot key entries or create a new entry
+    registeredHotKeys.set(
+      hotKeyString,
+      foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry]
+    );
   });
 
   onUnmounted(destroy);
 
+  // Provide the hotkey
+  provide(InjectSymbol, hotKeyString);
+
   return { enable, disable, destroy };
+};
+
+/**
+ * Get the latest registered hotkey
+ * @returns The hotkey combination
+ */
+export const getHotkey = () => {
+  const hotkey = inject<string>(InjectSymbol);
+
+  if (!hotkey) return;
+
+  return { hotkey, keys: hotkey.split("+") };
 };
 
 /**
@@ -66,10 +104,12 @@ const dispatchHotKey = (key: string[]) => {
 const keydown = (event: KeyboardEvent) => {
   const pressedKeys = buildHotkeyIndexFromEvent(event) as string;
 
-  const hotKeyEntry = registeredHotKeys.get(pressedKeys);
+  const hotKeyEntries = registeredHotKeys.get(pressedKeys);
 
   // Skip if the pressed keys are not registered as a hotkey
-  if (!hotKeyEntry) return;
+  if (!hotKeyEntries || hotKeyEntries.length === 0) return;
+
+  const hotKeyEntry = hotKeyEntries[hotKeyEntries.length - 1];
 
   const hotKey = hotKeyEntry.hotKey;
 

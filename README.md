@@ -1,7 +1,8 @@
+Vue 3 keyboard shortcut library.
+
 [![npm](https://img.shields.io/npm/v/@simolation/vue-hotkey)](https://www.npmjs.com/package/@simolation/vue-hotkey) ![npm](https://img.shields.io/npm/dw/@simolation/vue-hotkey) [![NPM](https://img.shields.io/npm/l/@simolation/vue-hotkey)](https://github.com/Simolation/vue-hotkey/blob/main/LICENSE)
 
-Vue 3 keyboard shortcut library. Also usable in Vue 2 due to [VueDemi](https://github.com/vueuse/vue-demi).
-For Vue 2 the `@vue/composition-api` is required.
+Also usable in Vue 2 with to [VueDemi](https://github.com/vueuse/vue-demi). For Vue 2 the `@vue/composition-api` is required.
 
 ## Install
 
