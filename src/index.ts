@@ -1,6 +1,6 @@
 // export { IHotKey } from "./interfaces/IHotkey";
 export { HotkeyEvent as HotKeyEvent } from "./interfaces/HotkeyEvent";
-export { useHotkey } from "./hooks/useHotkey";
+export { useHotkey, getHotkey } from "./hooks/useHotkey";
 
 import { App, install as vueDemiInstall } from "vue-demi";
 vueDemiInstall();
