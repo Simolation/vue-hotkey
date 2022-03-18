@@ -1,4 +1,11 @@
-import { inject, onMounted, onUnmounted, provide, ref } from "vue-demi";
+import {
+  inject,
+  InjectionKey,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue-demi";
 import { IHotkey, IHotkeyMap } from "../interfaces/IHotkey";
 import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
@@ -9,7 +16,7 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotkeyMap = new Map();
 
-const InjectSymbol = Symbol("hotkey");
+const InjectSymbol = Symbol("hotkey") as InjectionKey<string>;
 
 export const useHotkey = (
   hotKey: IHotkey,
@@ -78,7 +85,7 @@ export const useHotkey = (
  * @returns The hotkey combination
  */
 export const getHotkey = () => {
-  const hotkey = inject<string>(InjectSymbol);
+  const hotkey = inject(InjectSymbol, null);
 
   if (!hotkey) return;
 
