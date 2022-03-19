@@ -71,17 +71,9 @@ export const buildHotkeyIndexFromEvent = (
   return keys.join("+");
 };
 
-export const replacePlatformSpecificKey = (pKey: string[]) => {
-  return pKey.map((key) => {
-    if (isMacOs)
-      return key.replace("primary", "meta").replace("secondary", "ctrl");
-    return key.replace("primary", "ctrl").replace("secondary", "alt");
-  });
-};
-
 export const buildHotkeyIndexFromString = (pKey: string[]): string => {
   // Replace primary key actions
-  pKey = replacePlatformSpecificKey(pKey);
+  pKey = transformPlatformToSpecificKey(pKey);
 
   // Build key string
   const keys: any = {};
