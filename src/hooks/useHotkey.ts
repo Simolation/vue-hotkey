@@ -17,7 +17,7 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotkeyMap = new Map();
 
-const InjectSymbol = Symbol("hotkey") as InjectionKey<string>;
+const InjectSymbol = Symbol("hotkey") as InjectionKey<string[]>;
 
 export const useHotkey = (
   hotKey: IHotkey,
@@ -75,10 +75,13 @@ export const useHotkey = (
 
   onUnmounted(destroy);
 
-  // Provide the hotkey
-  provide(InjectSymbol, hotKeyString);
+  // Provide hotkey keys
+  const keys = transformPlatformToSpecificKey(hotKeyString.split("+"));
 
-  return { enable, disable, destroy };
+  // Provide the hotkey
+  provide(InjectSymbol, keys);
+
+  return { enable, disable, destroy, keys };
 };
 
 /**
@@ -86,14 +89,11 @@ export const useHotkey = (
  * @returns The hotkey combination
  */
 export const getHotkey = () => {
-  const hotkey = inject(InjectSymbol, null);
+  const keys = inject(InjectSymbol, null);
 
-  if (!hotkey) return;
+  if (!keys) return;
 
-  // Hotkey array and adjust primary actions to match the platform
-  const keys = transformPlatformToSpecificKey(hotkey.split("+"));
-
-  return { hotkey, keys };
+  return { keys };
 };
 
 /**

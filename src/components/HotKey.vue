@@ -56,7 +56,7 @@ export default defineComponent({
     const focusRef = ref<HTMLElement | null>(null);
 
     // Enable hotkey
-    useHotkey(
+    const { keys } = useHotkey(
       {
         keys: keyValue,
         handler: (keys: string[]) => {
@@ -78,6 +78,7 @@ export default defineComponent({
       return slots.default?.({
         clickRef,
         focusRef,
+        keys,
       });
     };
   },
