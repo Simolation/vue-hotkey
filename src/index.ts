@@ -1,4 +1,4 @@
-// export { IHotKey } from "./interfaces/IHotkey";
+// export { IHotkey } from "./interfaces/IHotkey";
 export { HotkeyEvent as HotKeyEvent } from "./interfaces/HotkeyEvent";
 export { useHotkey, getHotkey } from "./hooks/useHotkey";
 

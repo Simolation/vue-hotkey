@@ -17,10 +17,10 @@ export const buildHotkeyIndexFromEvent = (
   asArray: boolean = false
 ): string | string[] => {
   let keys: string[] = [];
-  if (eKey.key === "Shift" || eKey.shiftKey) keys.push("shift");
-  if (eKey.key === "Control" || eKey.ctrlKey) keys.push("ctrl");
   if (eKey.key === "Meta" || eKey.metaKey) keys.push("meta");
+  if (eKey.key === "Control" || eKey.ctrlKey) keys.push("ctrl");
   if (eKey.key === "Alt" || eKey.altKey) keys.push("alt");
+  if (eKey.key === "Shift" || eKey.shiftKey) keys.push("shift");
   if (eKey.key === "ArrowUp") keys.push("arrowup");
   if (eKey.key === "ArrowLeft") keys.push("arrowleft");
   if (eKey.key === "ArrowRight") keys.push("arrowright");
@@ -59,13 +59,13 @@ export const buildHotkeyIndexFromEvent = (
 
 export const buildHotkeyIndexFromString = (pKey: string[]) => {
   const keys: any = {};
-  keys.shiftKey = pKey.includes("shift");
-  keys.ctrlKey = pKey.includes("ctrl");
   keys.metaKey = pKey.includes("meta");
+  keys.ctrlKey = pKey.includes("ctrl");
   keys.altKey = pKey.includes("alt");
+  keys.shiftKey = pKey.includes("shift");
   let indexedKeys: string[] = buildHotkeyIndexFromEvent(keys, true) as string[];
   const vKey = pKey.filter(
-    (item) => !["shift", "ctrl", "meta", "alt"].includes(item)
+    (item) => !["ctrl", "shift", "meta", "alt"].includes(item)
   );
   indexedKeys.push(...vKey);
   return indexedKeys.join("+");
