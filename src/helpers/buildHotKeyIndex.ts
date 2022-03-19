@@ -1,3 +1,9 @@
+export const isMacOs =
+  // @ts-expect-error: https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData/platform
+  (navigator.platform ?? navigator.userAgentData?.platform)
+    .toLowerCase()
+    .indexOf("mac") >= 0;
+
 /**
  * Transform the keyboard event to a hotkey string
  * @param eKey The keyboard event
@@ -11,15 +17,23 @@
  *
  * @source https://github.com/iFgR/vue-shortkey/blob/55d802ea305cadcc2ea970b55a3b8b86c7b44c05/src/index.js#L81
  */
-
 export const buildHotkeyIndexFromEvent = (
   eKey: KeyboardEvent,
   asArray: boolean = false
 ): string | string[] => {
   let keys: string[] = [];
-  if (eKey.key === "Meta" || eKey.metaKey) keys.push("meta");
-  if (eKey.key === "Control" || eKey.ctrlKey) keys.push("ctrl");
-  if (eKey.key === "Alt" || eKey.altKey) keys.push("alt");
+  if (eKey.key === "Meta" || eKey.metaKey) {
+    if (isMacOs) keys.push("primary");
+    else keys.push("meta");
+  }
+  if (eKey.key === "Control" || eKey.ctrlKey) {
+    if (isMacOs) keys.push("secondary");
+    else keys.push("primary");
+  }
+  if (eKey.key === "Alt" || eKey.altKey) {
+    if (isMacOs) keys.push("alt");
+    else keys.push("secondary");
+  }
   if (eKey.key === "Shift" || eKey.shiftKey) keys.push("shift");
   if (eKey.key === "ArrowUp") keys.push("arrowup");
   if (eKey.key === "ArrowLeft") keys.push("arrowleft");
@@ -57,7 +71,19 @@ export const buildHotkeyIndexFromEvent = (
   return keys.join("+");
 };
 
-export const buildHotkeyIndexFromString = (pKey: string[]) => {
+export const replacePlatformSpecificKey = (pKey: string[]) => {
+  return pKey.map((key) => {
+    if (isMacOs)
+      return key.replace("primary", "meta").replace("secondary", "ctrl");
+    return key.replace("primary", "ctrl").replace("secondary", "alt");
+  });
+};
+
+export const buildHotkeyIndexFromString = (pKey: string[]): string => {
+  // Replace primary key actions
+  pKey = replacePlatformSpecificKey(pKey);
+
+  // Build key string
   const keys: any = {};
   keys.metaKey = pKey.includes("meta");
   keys.ctrlKey = pKey.includes("ctrl");
@@ -69,4 +95,17 @@ export const buildHotkeyIndexFromString = (pKey: string[]) => {
   );
   indexedKeys.push(...vKey);
   return indexedKeys.join("+");
+};
+
+/**
+ * Replace primary key actions with the correct key for the current platform
+ * @param pKey Array of hotkeys
+ * @returns Adapted hotkeys array
+ */
+export const transformPlatformToSpecificKey = (pKey: string[]) => {
+  return pKey.map((key) => {
+    if (isMacOs)
+      return key.replace("primary", "meta").replace("secondary", "ctrl");
+    return key.replace("primary", "ctrl").replace("secondary", "alt");
+  });
 };

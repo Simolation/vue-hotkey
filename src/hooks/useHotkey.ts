@@ -11,6 +11,7 @@ import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
   buildHotkeyIndexFromString,
   buildHotkeyIndexFromEvent,
+  transformPlatformToSpecificKey,
 } from "../helpers/buildHotKeyIndex";
 import { isElementAvailable } from "../helpers/isElementAvailable";
 
@@ -89,7 +90,10 @@ export const getHotkey = () => {
 
   if (!hotkey) return;
 
-  return { hotkey, keys: hotkey.split("+") };
+  // Hotkey array and adjust primary actions to match the platform
+  const keys = transformPlatformToSpecificKey(hotkey.split("+"));
+
+  return { hotkey, keys };
 };
 
 /**
