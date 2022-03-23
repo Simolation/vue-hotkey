@@ -4,6 +4,7 @@ import {
   onMounted,
   onUnmounted,
   provide,
+  Ref,
   ref,
 } from "vue-demi";
 import { IHotkey, IHotkeyMap } from "../interfaces/IHotkey";
@@ -17,7 +18,12 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotkeyMap = new Map();
 
-const InjectSymbol = Symbol("hotkey") as InjectionKey<string[]>;
+interface IHotkeyProvider {
+  keys: string[];
+  enabled: Ref<boolean>;
+}
+
+const InjectSymbol = Symbol("hotkey") as InjectionKey<IHotkeyProvider>;
 
 export const useHotkey = (
   hotKey: IHotkey,
@@ -79,7 +85,7 @@ export const useHotkey = (
   const keys = transformPlatformToSpecificKey(hotKeyString.split("+"));
 
   // Provide the hotkey
-  provide(InjectSymbol, keys);
+  provide(InjectSymbol, { keys, enabled: hotKey.enabled });
 
   return { enable, disable, destroy, keys };
 };
@@ -91,7 +97,7 @@ export const useHotkey = (
 export const getHotkey = () => {
   const keys = inject(InjectSymbol, null);
 
-  if (!keys) return;
+  if (!keys || !keys.enabled.value) return;
 
   return { keys };
 };
