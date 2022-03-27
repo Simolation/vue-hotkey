@@ -95,11 +95,11 @@ export const useHotkey = (
  * @returns The hotkey combination
  */
 export const getHotkey = () => {
-  const keys = inject(InjectSymbol, null);
+  const injected = inject(InjectSymbol, null);
 
-  if (!keys || !keys.enabled.value) return;
+  if (!injected || !injected.enabled.value) return;
 
-  return { keys };
+  return { keys: injected.keys };
 };
 
 /**
