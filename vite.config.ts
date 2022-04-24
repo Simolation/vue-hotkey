@@ -22,6 +22,8 @@ export default defineConfig({
           vue: "Vue",
           "vue-demi": "VueDemi",
         },
+
+        exports: "named",
       },
     },
   },
