@@ -73,7 +73,7 @@ export const buildHotkeyIndexFromEvent = (
 
 export const buildHotkeyIndexFromString = (pKey: string[]): string => {
   // Replace primary key actions
-  pKey = transformPlatformToSpecificKey(pKey);
+  pKey = platformSpecificHotkeys(pKey);
 
   // Build key string
   const keys: any = {};
@@ -94,7 +94,7 @@ export const buildHotkeyIndexFromString = (pKey: string[]): string => {
  * @param pKey Array of hotkeys
  * @returns Adapted hotkeys array
  */
-export const transformPlatformToSpecificKey = (pKey: string[]) => {
+export const platformSpecificHotkeys = (pKey: string[]) => {
   return pKey.map((key) => {
     if (isMacOs)
       return key.replace("primary", "meta").replace("secondary", "ctrl");

@@ -2,6 +2,7 @@
 export { HotkeyEvent as HotKeyEvent } from "./interfaces/HotkeyEvent";
 export { isMacOs } from "./helpers/buildHotKeyIndex";
 export { useHotkey, getHotkey } from "./hooks/useHotkey";
+import { platformSpecificHotkeys } from "./helpers/buildHotKeyIndex";
 
 import { App, install as vueDemiInstall } from "vue-demi";
 vueDemiInstall();
@@ -13,4 +14,4 @@ function install(Vue: App) {
 }
 
 export default { install };
-export { Hotkey };
+export { Hotkey, platformSpecificHotkeys };

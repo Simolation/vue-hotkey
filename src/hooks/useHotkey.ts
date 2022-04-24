@@ -12,7 +12,7 @@ import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
   buildHotkeyIndexFromString,
   buildHotkeyIndexFromEvent,
-  transformPlatformToSpecificKey,
+  platformSpecificHotkeys,
 } from "../helpers/buildHotKeyIndex";
 import { isElementAvailable } from "../helpers/isElementAvailable";
 
@@ -82,7 +82,7 @@ export const useHotkey = (
   onUnmounted(destroy);
 
   // Provide hotkey keys
-  const keys = transformPlatformToSpecificKey(hotKeyString.split("+"));
+  const keys = platformSpecificHotkeys(hotKeyString.split("+"));
 
   // Provide the hotkey
   provide(InjectSymbol, { keys, enabled: hotKey.enabled });
