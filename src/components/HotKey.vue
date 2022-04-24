@@ -52,8 +52,8 @@ export default defineComponent({
         ? (JSON.parse(props.keys.replace(/\'/gi, '"')) as string[])
         : props.keys;
 
-    const clickRef = ref<HTMLElement | null>(null);
-    const focusRef = ref<HTMLElement | null>(null);
+    const clickRef = ref<(HTMLElement & { $el?: HTMLElement }) | null>(null);
+    const focusRef = ref<(HTMLElement & { $el?: HTMLElement }) | null>(null);
 
     // Enable hotkey
     const { keys } = useHotkey(
@@ -61,8 +61,18 @@ export default defineComponent({
         keys: keyValue,
         handler: (keys: string[]) => {
           // When the element refs are not null, click/focus the element
-          clickRef.value?.click();
-          focusRef.value?.focus();
+
+          if (clickRef.value) {
+            // Resolve custom component elements or native elements
+            if (clickRef.value?.click) clickRef.value?.click();
+            else if (clickRef.value?.$el?.click) clickRef.value?.$el?.click();
+          }
+
+          if (focusRef.value) {
+            // Resolve custom component elements or native elements
+            if (focusRef.value?.focus) focusRef.value?.focus();
+            else if (focusRef.value?.$el?.focus) focusRef.value?.$el?.focus();
+          }
 
           // Emit the hotkey action
           emit("hotkey", keys);
