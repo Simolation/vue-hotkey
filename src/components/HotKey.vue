@@ -66,12 +66,22 @@ export default defineComponent({
             // Resolve custom component elements or native elements
             if (clickRef.value?.click) clickRef.value?.click();
             else if (clickRef.value?.$el?.click) clickRef.value?.$el?.click();
+            else {
+              console.warn(
+                `[VueHotkey] The clickRef is not a valid clickable element.`
+              );
+            }
           }
 
           if (focusRef.value) {
             // Resolve custom component elements or native elements
             if (focusRef.value?.focus) focusRef.value?.focus();
             else if (focusRef.value?.$el?.focus) focusRef.value?.$el?.focus();
+            else {
+              console.warn(
+                `[VueHotkey] The focusRef is not a valid focusable element.`
+              );
+            }
           }
 
           // Emit the hotkey action
