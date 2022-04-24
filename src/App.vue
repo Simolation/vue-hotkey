@@ -14,9 +14,9 @@ const onClick = () => {
 </script>
 
 <template>
-  <h1>Press Ctrl+S or Shift+Ctrl+S</h1>
+  <h1>Press Ctrl+S or Ctrl+Shift+S</h1>
 
-  <Hotkey :keys="['secondary', 'shift', 's']" @hotkey="action"></Hotkey>
+  <Hotkey :keys="['primary', 'shift', 's']" @hotkey="action"></Hotkey>
 
   <Hotkey :keys="['primary', 's']" v-slot="{ clickRef }">
     <button :ref="clickRef" @click="onClick">Add 4</button>
