@@ -27,10 +27,10 @@ const InjectSymbol = Symbol("hotkey") as InjectionKey<IHotkeyProvider>;
 
 export const useHotkey = (
   hotKey: IHotkey,
-  exludedElements: string[] = ["input", "textarea"]
+  excludedElements: string[] = ["input", "textarea"]
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
-  const hotKeyEntry = { hotKey, exludedElements };
+  const hotKeyEntry = { hotKey, excludedElements };
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
 
@@ -126,27 +126,32 @@ const keydown = (event: KeyboardEvent) => {
   // Skip if the pressed keys are not registered as a hotkey
   if (!hotKeyEntries || hotKeyEntries.length === 0) return;
 
-  const hotKeyEntry = hotKeyEntries[hotKeyEntries.length - 1];
+  // Loop all hotkeys
+  for (const hotKeyEntry of hotKeyEntries) {
+    const hotKey = hotKeyEntry.hotKey;
 
-  const hotKey = hotKeyEntry.hotKey;
+    // Skip if the hotkey is disabled
+    if (!hotKey.enabled!.value) continue;
 
-  // Skip if the hotkey is disabled
-  if (!hotKey.enabled!.value) return;
+    // Skip if the current element is not available
+    if (!isElementAvailable(hotKeyEntry.excludedElements)) continue;
 
-  // Skip if the current element is not available
-  if (!isElementAvailable(hotKeyEntry.exludedElements)) return;
+    // Stop propagation to prevent the default action
+    if (!hotKey.propagate?.value) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
-  // Stop propagation to prevent the default action
-  if (!hotKey.propagate?.value) {
-    event.preventDefault();
-    event.stopPropagation();
+    // Dispatch the handler
+    hotKey.handler(hotKey.keys);
+
+    // Dispatch the hotkey event
+    dispatchHotKey(hotKey.keys);
+
+    if (!hotKey.propagate?.value) {
+      break;
+    }
   }
-
-  // Dispatch the handler
-  hotKey.handler(hotKey.keys);
-
-  // Dispatch the hotkey event
-  dispatchHotKey(hotKey.keys);
 };
 
 /**

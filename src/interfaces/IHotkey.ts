@@ -9,7 +9,7 @@ export interface IHotkey {
 
 interface IHotkeyMapEntry {
   hotKey: IHotkey;
-  exludedElements?: string[];
+  excludedElements?: string[];
 }
 
 export type IHotkeyMap = Map<string, IHotkeyMapEntry[]>;

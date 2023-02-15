@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, computed } from "vue-demi";
+import { useMaybeBoolean } from "../helpers/maybeBoolean";
 import { useHotkey } from "../hooks/useHotkey";
 
 export default defineComponent({
@@ -23,15 +24,15 @@ export default defineComponent({
      * Propagate the hotkey event to the parent.
      */
     propagate: {
-      type: Boolean as PropType<boolean>,
+      type: [Boolean, String] as PropType<boolean | string>,
       default: false,
     },
     /**
      * Whether the hotkey is enabled or not
      */
-    enabled: {
-      type: Boolean as PropType<boolean>,
-      default: true,
+    disabled: {
+      type: [Boolean, String] as PropType<boolean | string>,
+      default: false,
     },
     /**
      * Exclude specific HTML elements from the hotkey.
@@ -87,8 +88,12 @@ export default defineComponent({
           // Emit the hotkey action
           emit("hotkey", keys);
         },
-        propagate: computed(() => props.propagate),
-        enabled: computed(() => props.enabled),
+        propagate: computed(() => useMaybeBoolean(props.propagate)),
+        enabled: computed(() => {
+          const tr = !useMaybeBoolean(props.disabled);
+          console.log("enabled", tr, props.disabled);
+          return tr;
+        }),
       },
       props.excludedElements
     );
