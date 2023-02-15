@@ -1,4 +1,5 @@
 import {
+  computed,
   inject,
   InjectionKey,
   onMounted,
@@ -7,7 +8,7 @@ import {
   Ref,
   ref,
 } from "vue-demi";
-import { IHotkey, IHotkeyMap } from "../interfaces/IHotkey";
+import { IHotkey, IHotkeyMap, IHotkeyMapEntry } from "../interfaces/IHotkey";
 import { HotkeyEvent } from "../interfaces/HotkeyEvent";
 import {
   buildHotkeyIndexFromString,
@@ -30,7 +31,11 @@ export const useHotkey = (
   excludedElements: string[] = ["input", "textarea"]
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
-  const hotKeyEntry = { hotKey, excludedElements };
+  const hotKeyEntry: IHotkeyMapEntry = {
+    hotKey,
+    excludedElements,
+    isPressed: ref(false),
+  };
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
 
@@ -84,10 +89,28 @@ export const useHotkey = (
   // Provide hotkey keys
   const keys = platformSpecificHotkeys(hotKeyString.split("+"));
 
+  /**
+   * Is the hotkey pressed
+   */
+  const isPressed = computed(() => hotKeyEntry.isPressed.value);
+
+  /**
+   * Trigger the action only when the hotkey is pressed while the keyCheck() function is called.
+   * @param action The action to trigger
+   */
+  const keyCheckFn = <Args extends any[], O = any>(
+    action: (...params: Args) => O
+  ) => {
+    return (...params: Args) => {
+      // Trigger the action only when the isPressed is true
+      if (isPressed.value) return action(...params);
+    };
+  };
+
   // Provide the hotkey
   provide(InjectSymbol, { keys, enabled: hotKey.enabled });
 
-  return { enable, disable, destroy, keys };
+  return { enable, disable, destroy, keys, isPressed, keyCheckFn };
 };
 
 /**
@@ -142,8 +165,13 @@ const keydown = (event: KeyboardEvent) => {
       event.stopPropagation();
     }
 
-    // Dispatch the handler
-    hotKey.handler(hotKey.keys);
+    // Set the hotkey as pressed
+    hotKeyEntry.isPressed.value = true;
+
+    // Dispatch the handler if available
+    if (hotKey.handler) {
+      hotKey.handler(hotKey.keys);
+    }
 
     // Dispatch the hotkey event
     dispatchHotKey(hotKey.keys);
@@ -158,7 +186,22 @@ const keydown = (event: KeyboardEvent) => {
  * Handle the keyup event
  * @param event The keyup event
  */
-const keyup = (event: KeyboardEvent) => {};
+const keyup = (event: KeyboardEvent) => {
+  const pressedKeys = buildHotkeyIndexFromEvent(event) as string;
+
+  const hotKeyEntries = registeredHotKeys.get(pressedKeys);
+
+  // Skip if the pressed keys are not registered as a hotkey
+  if (!hotKeyEntries || hotKeyEntries.length === 0) return;
+
+  // Loop all hotkeys
+  for (const hotKeyEntry of hotKeyEntries) {
+    if (hotKeyEntry.isPressed.value) {
+      // Set the hotkey as released
+      hotKeyEntry.isPressed.value = false;
+    }
+  }
+};
 
 // Register event listeners
 // Add keydown listener

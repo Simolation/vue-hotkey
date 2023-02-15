@@ -57,7 +57,7 @@ export default defineComponent({
     const focusRef = ref<(HTMLElement & { $el?: HTMLElement }) | null>(null);
 
     // Enable hotkey
-    const { keys } = useHotkey(
+    const { keys, keyCheckFn } = useHotkey(
       {
         keys: keyValue,
         handler: (keys: string[]) => {
@@ -89,13 +89,13 @@ export default defineComponent({
           emit("hotkey", keys);
         },
         propagate: computed(() => useMaybeBoolean(props.propagate)),
-        enabled: computed(() => {
-          const tr = !useMaybeBoolean(props.disabled);
-          console.log("enabled", tr, props.disabled);
-          return tr;
-        }),
+        enabled: computed(() => !useMaybeBoolean(props.disabled)),
       },
       props.excludedElements
+    );
+
+    const keyCheck = keyCheckFn((action: (...params: any[]) => any) =>
+      action()
     );
 
     // Render slot
@@ -104,6 +104,7 @@ export default defineComponent({
         clickRef,
         focusRef,
         keys,
+        keyCheck,
       });
     };
   },

@@ -14,12 +14,16 @@ const onClick = () => {
 </script>
 
 <template>
-  <h1>Press Ctrl+S or Ctrl+Shift+S</h1>
+  <h1>Press Ctrl+Shift+S</h1>
 
   <Hotkey :keys="['primary', 'shift', 's']" @hotkey="action"></Hotkey>
 
   <Hotkey :keys="['primary', 's']" v-slot="{ clickRef }">
     <button :ref="clickRef" @click="onClick">Add 4</button>
+  </Hotkey>
+
+  <Hotkey :keys="['alt']" v-slot="{ keyCheck }">
+    <button @click="keyCheck(onClick)">Add 4 while pressing Alt</button>
   </Hotkey>
 
   <br /><br />
