@@ -94,7 +94,7 @@ export default defineComponent({
       props.excludedElements
     );
 
-    const keyCheck = keyCheckFn((action: (...params: any[]) => any) =>
+    const keyCheck = keyCheckFn((action: (...params: any[]) => any | void) =>
       action()
     );
 

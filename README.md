@@ -81,7 +81,7 @@ With `:propagate="true"` the event will be passed to the parent listeners as wel
 
 ```html
 <template>
-  <Hotkey :keys="['ctrl', 's']" :propagate="true" @hotkey="action">
+  <Hotkey :keys="['ctrl', 's']" propagate @hotkey="action">
     <!-- any content -->
   </Hotkey>
 </template>
@@ -89,11 +89,11 @@ With `:propagate="true"` the event will be passed to the parent listeners as wel
 
 ##### Enable or Disable the hotkey
 
-When the hotkey should not be usable, it can easily be disabled by setting `:enabled="false"`.
+When the hotkey should not be usable, it can easily be disabled by setting `disabled`.
 
 ```html
 <template>
-  <Hotkey :keys="['ctrl', 's']" :enabled="false" @hotkey="action">
+  <Hotkey :keys="['ctrl', 's']" disabled @hotkey="action">
     <!-- any content -->
   </Hotkey>
 </template>
@@ -112,6 +112,18 @@ It will prevent the hotkey when the currently focused HTML element is of the spe
     @hotkey="action"
   >
     <!-- any content -->
+  </Hotkey>
+</template>
+```
+
+##### Key check
+
+Only call a function when the hotkey is pressed. Can be used for special on-click actions based on a hotkey.
+
+```html
+<template>
+  <Hotkey :keys="['alt']" v-slot="{ keyCheck }">
+    <button @click="keyCheck(onClick)">Click</button>
   </Hotkey>
 </template>
 ```
@@ -165,4 +177,18 @@ useHotkey(
   },
   ["radio", "div"]
 );
+```
+
+##### Key check function
+
+The excluded elements can be specified with the hook as well. The default is again `input` and `textarea`.
+
+```ts
+const { keyCheckFn } = useHotkey({ ... });
+
+const doSomething = keyCheckFn((name: string, count: number) => {
+  // do anything when the hotkey is pressed when doSomething is called
+})
+
+doSomething("myProps", 123);
 ```
