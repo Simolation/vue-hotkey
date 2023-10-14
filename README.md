@@ -181,13 +181,13 @@ useHotkey(
 
 ##### Key check function
 
-The excluded elements can be specified with the hook as well. The default is again `input` and `textarea`.
+The function provided as a parameter to the `keyCheckFn` will only be called when the hotkey is pressed when calling the returned function
 
 ```ts
 const { keyCheckFn } = useHotkey({ ... });
 
 const doSomething = keyCheckFn((name: string, count: number) => {
-  // do anything when the hotkey is pressed when doSomething is called
+  // do anything while the hotkey is pressed when doSomething is called
 })
 
 doSomething("myProps", 123);
