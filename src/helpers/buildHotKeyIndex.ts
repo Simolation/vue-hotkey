@@ -90,14 +90,68 @@ export const buildHotkeyIndexFromString = (pKey: string[]): string => {
 };
 
 /**
+ * Map of alternative key names to standard internal key names
+ */
+const keyAliases: Record<string, string> = {
+  // Alternative names for common keys
+  delete: "del",
+  escape: "esc",
+  return: "enter",
+  spacebar: "space",
+  
+  // Arrow key alternatives
+  up: "arrowup",
+  down: "arrowdown", 
+  left: "arrowleft",
+  right: "arrowright",
+  
+  // Modifier alternatives
+  control: "ctrl",
+  command: "meta",
+  cmd: "meta",
+  option: "alt",
+  opt: "alt",
+  
+  // Page navigation alternatives
+  pgup: "pageup",
+  pgdn: "pagedown",
+  pgdown: "pagedown",
+  
+  // Lock key alternatives
+  caps: "capslock",
+  num: "numlock",
+  scroll: "scrolllock",
+  
+  // Other alternatives
+  context: "contextmenu",
+  menu: "contextmenu",
+  ins: "insert"
+};
+
+/**
+ * Normalize key names by applying aliases and converting to lowercase
+ * @param key The key name to normalize
+ * @returns Normalized key name
+ */
+const normalizeKeyName = (key: string): string => {
+  const lowercaseKey = key.toLowerCase();
+  return keyAliases[lowercaseKey] || lowercaseKey;
+};
+
+/**
  * Replace primary key actions with the correct key for the current platform
+ * and apply key aliases
  * @param pKey Array of hotkeys
  * @returns Adapted hotkeys array
  */
 export const platformSpecificHotkeys = (pKey: string[]) => {
   return pKey.map((key) => {
+    // First normalize the key name (apply aliases)
+    let normalizedKey = normalizeKeyName(key);
+    
+    // Then apply platform-specific transformations
     if (isMacOs)
-      return key.replace("primary", "meta").replace("secondary", "ctrl");
-    return key.replace("primary", "ctrl").replace("secondary", "alt");
+      return normalizedKey.replace("primary", "meta").replace("secondary", "ctrl");
+    return normalizedKey.replace("primary", "ctrl").replace("secondary", "alt");
   });
 };

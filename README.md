@@ -14,6 +14,63 @@ npm install --save @simolation/vue-hotkey
 yarn add @simolation/vue-hotkey
 ```
 
+## Supported Keys
+
+This library supports a comprehensive set of keyboard keys and combinations:
+
+### Platform-Specific Keys
+- `primary` - Command key on macOS, Control key on other platforms
+- `secondary` - Control key on macOS, Alt key on other platforms
+
+### Modifier Keys
+- `meta` - Meta/Windows/Command key
+- `ctrl` - Control key
+- `alt` - Alt key
+- `shift` - Shift key
+- `altgraph` - AltGraph key
+
+### Navigation Keys
+- `esc` - Escape key
+- `enter` - Enter/Return key
+- `tab` - Tab key
+- `space` - Space bar
+- `arrowup`, `arrowdown`, `arrowleft`, `arrowright` - Arrow keys
+- `pageup`, `pagedown` - Page navigation
+- `home`, `end` - Home and End keys
+
+### Action Keys
+- `del` - Delete key
+- `backspace` - Backspace key
+- `insert` - Insert key
+
+### Lock Keys
+- `numlock`, `capslock`, `scrolllock` - Toggle keys
+
+### Function Keys
+- `f1` through `f12` - Function keys
+
+### Regular Characters
+- All letters (a-z), numbers (0-9), and symbols are supported
+- Keys are case-insensitive and automatically normalized
+
+### Alternative Key Names
+The library supports alternative names for common keys:
+- `delete` or `del` - Delete key
+- `escape` or `esc` - Escape key  
+- `return` or `enter` - Enter/Return key
+- `spacebar` or `space` - Space bar
+- `up`/`down`/`left`/`right` or `arrowup`/`arrowdown`/`arrowleft`/`arrowright` - Arrow keys
+- `control` or `ctrl` - Control key
+- `command`/`cmd` or `meta` - Meta/Command key
+- `option`/`opt` or `alt` - Alt/Option key
+- `pgup`/`pgdn`/`pgdown` or `pageup`/`pagedown` - Page navigation
+- `caps` or `capslock` - Caps Lock key
+- `context`/`menu` or `contextmenu` - Context Menu key
+- `ins` or `insert` - Insert key
+
+### Key Combinations
+Combine keys using arrays: `['ctrl', 's']`, `['primary', 'shift', 'n']`, `['alt', 'f4']`, `['delete']`
+
 ## Usage
 
 This package can be used as a Vue component or as a hook.
