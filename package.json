@@ -1,7 +1,10 @@
 {
   "name": "@simolation/vue-hotkey",
-  "version": "2.0.1",
-  "repository": "https://github.com/Simolation/vue-hotkey.git",
+  "version": "2.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Simolation/vue-hotkey.git"
+  },
   "author": "Simon Osterlehner <simon@osterlehner.de>",
   "license": "MIT",
   "private": false,
