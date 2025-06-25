@@ -22,6 +22,26 @@ const registeredHotKeys: IHotkeyMap = new Map();
 // Global counter for registration order
 let registrationCounter = 0;
 
+// Lazy event listener management
+let globalListenersRegistered = false;
+let activeHotkeyCount = 0;
+
+const registerGlobalListeners = () => {
+  if (!globalListenersRegistered) {
+    document.addEventListener("keydown", keydown, true);
+    document.addEventListener("keyup", keyup, true);
+    globalListenersRegistered = true;
+  }
+};
+
+const unregisterGlobalListeners = () => {
+  if (globalListenersRegistered && activeHotkeyCount === 0) {
+    document.removeEventListener("keydown", keydown, true);
+    document.removeEventListener("keyup", keyup, true);
+    globalListenersRegistered = false;
+  }
+};
+
 interface IHotkeyProvider {
   keys: string[];
   enabled: Ref<boolean>;
@@ -34,10 +54,10 @@ export const useHotkey = (
   excludedElements: string[] = ["input", "textarea"],
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
-  
+
   // Set default priority if not provided (higher number = higher priority)
   const priority = hotKey.priority ?? 0;
-  
+
   const hotKeyEntry: IHotkeyMapEntry = {
     hotKey,
     excludedElements,
@@ -80,15 +100,30 @@ export const useHotkey = (
     } else {
       registeredHotKeys.set(hotKeyString, updatedHotKeyEntries);
     }
+
+    // Decrement active count and potentially unregister global listeners
+    activeHotkeyCount--;
+    if (activeHotkeyCount <= 0) {
+      activeHotkeyCount = 0;
+      unregisterGlobalListeners();
+    }
   };
 
   onMounted(() => {
+    // Register global listeners if this is the first hotkey
+    if (activeHotkeyCount === 0) {
+      registerGlobalListeners();
+    }
+    activeHotkeyCount++;
+
     // Get the already existing hot key entries
     const foundHotKeyEntries = registeredHotKeys.get(hotKeyString);
 
     // Add the new entry and sort by priority (highest first), then by registration time (newest first)
-    const allEntries = foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry];
-    
+    const allEntries = foundHotKeyEntries
+      ? [...foundHotKeyEntries, hotKeyEntry]
+      : [hotKeyEntry];
+
     // Sort entries: higher priority first, then newer registration time first
     allEntries.sort((a, b) => {
       if (a.priority !== b.priority) {
@@ -96,7 +131,7 @@ export const useHotkey = (
       }
       return b.registrationTime - a.registrationTime; // Newer first for same priority
     });
-    
+
     registeredHotKeys.set(hotKeyString, allEntries);
   });
 
@@ -220,10 +255,3 @@ const keyup = (event: KeyboardEvent) => {
     }
   }
 };
-
-// Register event listeners
-// Add keydown listener
-document.addEventListener("keydown", keydown, true);
-
-// Add keyup listener
-document.addEventListener("keyup", keyup, true);

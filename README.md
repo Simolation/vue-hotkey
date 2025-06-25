@@ -55,18 +55,34 @@ This library supports a comprehensive set of keyboard keys and combinations:
 
 ### Alternative Key Names
 The library supports alternative names for common keys:
+
+**Basic Keys:**
 - `delete` or `del` - Delete key
 - `escape` or `esc` - Escape key  
 - `return` or `enter` - Enter/Return key
 - `spacebar` or `space` - Space bar
-- `up`/`down`/`left`/`right` or `arrowup`/`arrowdown`/`arrowleft`/`arrowright` - Arrow keys
+- `ins` or `insert` - Insert key
+
+**Arrow Keys:**
+- `up`/`down`/`left`/`right` or `arrowup`/`arrowdown`/`arrowleft`/`arrowright`
+
+**Modifier Keys:**
 - `control` or `ctrl` - Control key
 - `command`/`cmd` or `meta` - Meta/Command key
 - `option`/`opt` or `alt` - Alt/Option key
-- `pgup`/`pgdn`/`pgdown` or `pageup`/`pagedown` - Page navigation
+- `windows`/`win`/`super` or `meta` - Windows/Super key
+
+**Page Navigation:**
+- `pgup`/`pgdn`/`pgdown`/`pagedn` or `pageup`/`pagedown`
+
+**Lock Keys:**
 - `caps` or `capslock` - Caps Lock key
+- `num` or `numlock` - Num Lock key
+- `scroll` or `scrolllock` - Scroll Lock key
+
+**Other Keys:**
 - `context`/`menu` or `contextmenu` - Context Menu key
-- `ins` or `insert` - Insert key
+- `function`/`fn` - Function key
 
 ### Key Combinations
 Combine keys using arrays: `['ctrl', 's']`, `['primary', 'shift', 'n']`, `['alt', 'f4']`, `['delete']`

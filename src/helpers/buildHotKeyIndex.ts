@@ -1,8 +1,47 @@
-export const isMacOs =
+// Platform detection
+export const isMacOs = /mac/i.test(
   // @ts-expect-error: https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData/platform
-  (navigator.platform ?? navigator.userAgentData?.platform)
-    .toLowerCase()
-    .indexOf("mac") >= 0;
+  navigator.platform ?? navigator.userAgentData?.platform ?? ""
+);
+
+// Common modifier key constants
+const MODIFIER_KEYS = {
+  CTRL: "ctrl",
+  SHIFT: "shift", 
+  META: "meta",
+  ALT: "alt",
+  PRIMARY: "primary",
+  SECONDARY: "secondary"
+} as const;
+
+/**
+ * Mapping table for special keys to avoid multiple if statements
+ */
+const KEY_MAPPINGS = new Map([
+  ["ArrowUp", "arrowup"],
+  ["ArrowLeft", "arrowleft"], 
+  ["ArrowRight", "arrowright"],
+  ["ArrowDown", "arrowdown"],
+  ["AltGraph", "altgraph"],
+  ["Escape", "esc"],
+  ["Enter", "enter"],
+  ["Tab", "tab"],
+  [" ", "space"],
+  ["PageUp", "pageup"],
+  ["PageDown", "pagedown"],
+  ["Home", "home"],
+  ["End", "end"],
+  ["Delete", "del"],
+  ["Backspace", "backspace"],
+  ["Insert", "insert"],
+  ["NumLock", "numlock"],
+  ["CapsLock", "capslock"],
+  ["Pause", "pause"],
+  ["ContextMenu", "contextmenu"],
+  ["ScrollLock", "scrolllock"],
+  ["BrowserHome", "browserhome"],
+  ["MediaSelect", "mediaselect"]
+]);
 
 /**
  * Transform the keyboard event to a hotkey string
@@ -21,54 +60,35 @@ export const buildHotkeyIndexFromEvent = (
   eKey: KeyboardEvent,
   asArray: boolean = false
 ): string | string[] => {
-  let keys: string[] = [];
+  const keys: string[] = [];
+  
+  // Handle modifier keys with platform awareness
   if (eKey.key === "Meta" || eKey.metaKey) {
-    if (isMacOs) keys.push("primary");
-    else keys.push("meta");
+    keys.push(isMacOs ? MODIFIER_KEYS.PRIMARY : MODIFIER_KEYS.META);
   }
   if (eKey.key === "Control" || eKey.ctrlKey) {
-    if (isMacOs) keys.push("secondary");
-    else keys.push("primary");
+    keys.push(isMacOs ? MODIFIER_KEYS.SECONDARY : MODIFIER_KEYS.PRIMARY);
   }
   if (eKey.key === "Alt" || eKey.altKey) {
-    if (isMacOs) keys.push("alt");
-    else keys.push("secondary");
+    keys.push(isMacOs ? MODIFIER_KEYS.ALT : MODIFIER_KEYS.SECONDARY);
   }
-  if (eKey.key === "Shift" || eKey.shiftKey) keys.push("shift");
-  if (eKey.key === "ArrowUp") keys.push("arrowup");
-  if (eKey.key === "ArrowLeft") keys.push("arrowleft");
-  if (eKey.key === "ArrowRight") keys.push("arrowright");
-  if (eKey.key === "ArrowDown") keys.push("arrowdown");
-  if (eKey.key === "AltGraph") keys.push("altgraph");
-  if (eKey.key === "Escape") keys.push("esc");
-  if (eKey.key === "Enter") keys.push("enter");
-  if (eKey.key === "Tab") keys.push("tab");
-  if (eKey.key === " ") keys.push("space");
-  if (eKey.key === "PageUp") keys.push("pageup");
-  if (eKey.key === "PageDown") keys.push("pagedown");
-  if (eKey.key === "Home") keys.push("home");
-  if (eKey.key === "End") keys.push("end");
-  if (eKey.key === "Delete") keys.push("del");
-  if (eKey.key === "Backspace") keys.push("backspace");
-  if (eKey.key === "Insert") keys.push("insert");
-  if (eKey.key === "NumLock") keys.push("numlock");
-  if (eKey.key === "CapsLock") keys.push("capslock");
-  if (eKey.key === "Pause") keys.push("pause");
-  if (eKey.key === "ContextMenu") keys.push("contextmenu");
-  if (eKey.key === "ScrollLock") keys.push("scrolllock");
-  if (eKey.key === "BrowserHome") keys.push("browserhome");
-  if (eKey.key === "MediaSelect") keys.push("mediaselect");
+  if (eKey.key === "Shift" || eKey.shiftKey) {
+    keys.push(MODIFIER_KEYS.SHIFT);
+  }
 
-  // Add all regular characters
-  if (
+  // Use lookup table for special keys
+  const mappedKey = KEY_MAPPINGS.get(eKey.key);
+  if (mappedKey) {
+    keys.push(mappedKey);
+  } else if (
+    // Handle regular characters and function keys
     (eKey.key && eKey.key !== " " && eKey.key.length === 1) ||
     /F\d{1,2}|\//g.test(eKey.key)
-  )
+  ) {
     keys.push(eKey.key.toLowerCase());
+  }
 
-  if (asArray) return keys;
-
-  return keys.join("+");
+  return asArray ? keys : keys.join("+");
 };
 
 export const buildHotkeyIndexFromString = (pKey: string[]): string => {
@@ -77,13 +97,13 @@ export const buildHotkeyIndexFromString = (pKey: string[]): string => {
 
   // Build key string
   const keys: any = {};
-  keys.metaKey = pKey.includes("meta");
-  keys.ctrlKey = pKey.includes("ctrl");
-  keys.altKey = pKey.includes("alt");
-  keys.shiftKey = pKey.includes("shift");
+  keys.metaKey = pKey.includes(MODIFIER_KEYS.META);
+  keys.ctrlKey = pKey.includes(MODIFIER_KEYS.CTRL);
+  keys.altKey = pKey.includes(MODIFIER_KEYS.ALT);
+  keys.shiftKey = pKey.includes(MODIFIER_KEYS.SHIFT);
   let indexedKeys: string[] = buildHotkeyIndexFromEvent(keys, true) as string[];
   const vKey = pKey.filter(
-    (item) => !["ctrl", "shift", "meta", "alt"].includes(item)
+    (item) => ![MODIFIER_KEYS.CTRL, MODIFIER_KEYS.SHIFT, MODIFIER_KEYS.META, MODIFIER_KEYS.ALT].includes(item as any)
   );
   indexedKeys.push(...vKey);
   return indexedKeys.join("+");
@@ -91,42 +111,52 @@ export const buildHotkeyIndexFromString = (pKey: string[]): string => {
 
 /**
  * Map of alternative key names to standard internal key names
+ * Includes commonly expected aliases for better developer experience
  */
-const keyAliases: Record<string, string> = {
-  // Alternative names for common keys
-  delete: "del",
-  escape: "esc",
-  return: "enter",
-  spacebar: "space",
+const keyAliases = new Map([
+  // Common key alternatives
+  ["delete", "del"],
+  ["escape", "esc"], 
+  ["return", "enter"],
+  ["spacebar", "space"],
   
   // Arrow key alternatives
-  up: "arrowup",
-  down: "arrowdown", 
-  left: "arrowleft",
-  right: "arrowright",
+  ["up", "arrowup"],
+  ["down", "arrowdown"],
+  ["left", "arrowleft"],
+  ["right", "arrowright"],
   
   // Modifier alternatives
-  control: "ctrl",
-  command: "meta",
-  cmd: "meta",
-  option: "alt",
-  opt: "alt",
+  ["control", "ctrl"],
+  ["command", "meta"],
+  ["cmd", "meta"],
+  ["option", "alt"],
+  ["opt", "alt"],
   
   // Page navigation alternatives
-  pgup: "pageup",
-  pgdn: "pagedown",
-  pgdown: "pagedown",
+  ["pgup", "pageup"],
+  ["pgdn", "pagedown"],
+  ["pgdown", "pagedown"],
+  ["pagedn", "pagedown"],
   
   // Lock key alternatives
-  caps: "capslock",
-  num: "numlock",
-  scroll: "scrolllock",
+  ["caps", "capslock"],
+  ["capslock", "capslock"], // Some users might expect this
+  ["num", "numlock"],
+  ["scroll", "scrolllock"],
   
-  // Other alternatives
-  context: "contextmenu",
-  menu: "contextmenu",
-  ins: "insert"
-};
+  // Other common alternatives
+  ["context", "contextmenu"],
+  ["menu", "contextmenu"],
+  ["ins", "insert"],
+  ["windows", "meta"],
+  ["win", "meta"],
+  ["super", "meta"], // Linux users
+  
+  // Function key alternatives
+  ["function", "fn"],
+  ["fn", "fn"]
+]);
 
 /**
  * Normalize key names by applying aliases and converting to lowercase
@@ -135,7 +165,7 @@ const keyAliases: Record<string, string> = {
  */
 const normalizeKeyName = (key: string): string => {
   const lowercaseKey = key.toLowerCase();
-  return keyAliases[lowercaseKey] || lowercaseKey;
+  return keyAliases.get(lowercaseKey) || lowercaseKey;
 };
 
 /**
@@ -150,8 +180,13 @@ export const platformSpecificHotkeys = (pKey: string[]) => {
     let normalizedKey = normalizeKeyName(key);
     
     // Then apply platform-specific transformations
-    if (isMacOs)
-      return normalizedKey.replace("primary", "meta").replace("secondary", "ctrl");
-    return normalizedKey.replace("primary", "ctrl").replace("secondary", "alt");
+    if (isMacOs) {
+      return normalizedKey
+        .replace(MODIFIER_KEYS.PRIMARY, MODIFIER_KEYS.META)
+        .replace(MODIFIER_KEYS.SECONDARY, MODIFIER_KEYS.CTRL);
+    }
+    return normalizedKey
+      .replace(MODIFIER_KEYS.PRIMARY, MODIFIER_KEYS.CTRL)
+      .replace(MODIFIER_KEYS.SECONDARY, MODIFIER_KEYS.ALT);
   });
 };
