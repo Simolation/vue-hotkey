@@ -9,7 +9,7 @@ import {
   ref,
 } from "vue-demi";
 import { IHotkey, IHotkeyMap, IHotkeyMapEntry } from "../interfaces/IHotkey";
-import { HotkeyEvent } from "../interfaces/HotkeyEvent";
+import { HotkeyEvent } from "../interfaces/HotKeyEvent";
 import {
   buildHotkeyIndexFromString,
   buildHotkeyIndexFromEvent,
@@ -28,7 +28,7 @@ const InjectSymbol = Symbol("hotkey") as InjectionKey<IHotkeyProvider>;
 
 export const useHotkey = (
   hotKey: IHotkey,
-  excludedElements: string[] = ["input", "textarea"]
+  excludedElements: string[] = ["input", "textarea"],
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
   const hotKeyEntry: IHotkeyMapEntry = {
@@ -62,7 +62,7 @@ export const useHotkey = (
 
     // Remove the current hotkey from the list
     const updatedHotKeyEntries = foundHotKeyEntries.filter(
-      (entry) => entry !== hotKeyEntry
+      (entry) => entry !== hotKeyEntry,
     );
 
     // Update the hotkey list
@@ -80,7 +80,7 @@ export const useHotkey = (
     // Append to the existing hot key entries or create a new entry
     registeredHotKeys.set(
       hotKeyString,
-      foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry]
+      foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry],
     );
   });
 
@@ -99,7 +99,7 @@ export const useHotkey = (
    * @param action The action to trigger
    */
   const keyCheckFn = <Args extends any[], O = any>(
-    action: (...params: Args) => O
+    action: (...params: Args) => O,
   ) => {
     return (...params: Args) => {
       // Trigger the action only when the isPressed is true
