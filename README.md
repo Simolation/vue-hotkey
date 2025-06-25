@@ -173,6 +173,34 @@ It will prevent the hotkey when the currently focused HTML element is of the spe
 </template>
 ```
 
+##### Priority system
+
+Control the order in which hotkeys are executed when multiple components register the same hotkey. Higher priority numbers take precedence. Useful for modals, popups, and overlays.
+
+```html
+<template>
+  <!-- Base application ESC handler (low priority) -->
+  <Hotkey :keys="['esc']" :priority="0" @hotkey="closeApp">
+    <!-- app content -->
+  </Hotkey>
+
+  <!-- Modal ESC handler (higher priority) -->
+  <Hotkey :keys="['esc']" :priority="100" @hotkey="closeModal" v-if="showModal">
+    <!-- modal content -->
+  </Hotkey>
+
+  <!-- Popup ESC handler (highest priority) -->
+  <Hotkey :keys="['esc']" :priority="200" @hotkey="closePopup" v-if="showPopup">
+    <!-- popup content -->
+  </Hotkey>
+</template>
+```
+
+When multiple hotkeys with the same key combination are registered:
+1. **Higher priority executes first** - Priority 200 runs before priority 100
+2. **Same priority uses registration order** - Newer registrations take precedence
+3. **Only one handler executes** - Unless `propagate` is enabled
+
 ##### Key check
 
 Only call a function when the hotkey is pressed. Can be used for special on-click actions based on a hotkey.
@@ -200,6 +228,7 @@ useHotkey({
   // optional:
   propagate: ref(false),
   enabled: ref(true),
+  priority: 100, // Higher numbers = higher priority
 });
 ```
 
@@ -248,4 +277,26 @@ const doSomething = keyCheckFn((name: string, count: number) => {
 })
 
 doSomething("myProps", 123);
+```
+
+##### Priority with hooks
+
+Use priority to control the execution order when multiple hooks register the same hotkey:
+
+```ts
+// Base level hotkey (default priority 0)
+useHotkey({
+  keys: ["esc"],
+  handler: () => console.log("Base ESC handler"),
+});
+
+// Modal hotkey (higher priority)
+useHotkey({
+  keys: ["esc"], 
+  handler: () => console.log("Modal ESC handler"),
+  priority: 100,
+});
+
+// Only the modal handler will execute (highest priority)
+// Unless propagate: ref(true) is set
 ```

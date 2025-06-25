@@ -19,6 +19,9 @@ import { isElementAvailable } from "../helpers/isElementAvailable";
 
 const registeredHotKeys: IHotkeyMap = new Map();
 
+// Global counter for registration order
+let registrationCounter = 0;
+
 interface IHotkeyProvider {
   keys: string[];
   enabled: Ref<boolean>;
@@ -31,10 +34,16 @@ export const useHotkey = (
   excludedElements: string[] = ["input", "textarea"],
 ) => {
   const hotKeyString = buildHotkeyIndexFromString(hotKey.keys);
+  
+  // Set default priority if not provided (higher number = higher priority)
+  const priority = hotKey.priority ?? 0;
+  
   const hotKeyEntry: IHotkeyMapEntry = {
     hotKey,
     excludedElements,
     isPressed: ref(false),
+    priority,
+    registrationTime: ++registrationCounter,
   };
 
   hotKey.enabled = hotKey.enabled ?? ref(true);
@@ -77,11 +86,18 @@ export const useHotkey = (
     // Get the already existing hot key entries
     const foundHotKeyEntries = registeredHotKeys.get(hotKeyString);
 
-    // Append to the existing hot key entries or create a new entry
-    registeredHotKeys.set(
-      hotKeyString,
-      foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry],
-    );
+    // Add the new entry and sort by priority (highest first), then by registration time (newest first)
+    const allEntries = foundHotKeyEntries ? [...foundHotKeyEntries, hotKeyEntry] : [hotKeyEntry];
+    
+    // Sort entries: higher priority first, then newer registration time first
+    allEntries.sort((a, b) => {
+      if (a.priority !== b.priority) {
+        return b.priority - a.priority; // Higher priority first
+      }
+      return b.registrationTime - a.registrationTime; // Newer first for same priority
+    });
+    
+    registeredHotKeys.set(hotKeyString, allEntries);
   });
 
   onUnmounted(destroy);
@@ -149,7 +165,8 @@ const keydown = (event: KeyboardEvent) => {
   // Skip if the pressed keys are not registered as a hotkey
   if (!hotKeyEntries || hotKeyEntries.length === 0) return;
 
-  // Loop all hotkeys
+  // Hotkeys are already sorted by priority (highest first) and registration time (newest first)
+  // Loop through hotkeys in priority order
   for (const hotKeyEntry of hotKeyEntries) {
     const hotKey = hotKeyEntry.hotKey;
 
@@ -176,6 +193,7 @@ const keydown = (event: KeyboardEvent) => {
     // Dispatch the hotkey event
     dispatchHotKey(hotKey.keys);
 
+    // If propagate is false, only execute the highest priority hotkey and stop
     if (!hotKey.propagate?.value) {
       break;
     }

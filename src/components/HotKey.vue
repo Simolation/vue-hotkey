@@ -44,6 +44,17 @@ export default defineComponent({
       type: Array as PropType<string[] | undefined>,
       default: undefined,
     },
+    /**
+     * Priority level for the hotkey. Higher numbers have higher priority.
+     * Useful for modals and popups where newer elements should handle hotkeys first.
+     * ```vue
+     * :priority="100"
+     * ```
+     */
+    priority: {
+      type: Number,
+      default: 0,
+    },
   },
   emits: ["hotkey"],
   setup(props, { emit, slots }) {
@@ -90,6 +101,7 @@ export default defineComponent({
         },
         propagate: computed(() => useMaybeBoolean(props.propagate)),
         enabled: computed(() => !useMaybeBoolean(props.disabled)),
+        priority: props.priority,
       },
       props.excludedElements
     );
